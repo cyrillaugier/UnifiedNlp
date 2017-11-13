@@ -38,47 +38,49 @@ int getMyVersionCode() {
     exec {
         commandLine 'git', 'rev-list', '--count', "HEAD"
         standardOutput = stdout
-    }
-    return Integer.parseInt(stdout.toString().trim())
-}
 
-android {
-    compileSdkVersion androidCompileSdk()
-    buildToolsVersion "$androidBuildVersionTools"
 
-    defaultConfig {
-        versionName getMyVersionName()
-        versionCode(20000 + getMyVersionCode())
-        minSdkVersion androidMinSdk()
-        targetSdkVersion androidTargetSdk()
+        return Integer.parseInt(stdout.toString().trim())
     }
 
-    productFlavors {
-        NetworkLocation {
-            applicationId = 'com.google.android.gms'
-            minSdkVersion 19
+    android {
+        compileSdkVersion androidCompileSdk()
+        buildToolsVersion "$androidBuildVersionTools"
+
+        defaultConfig {
+            versionName getMyVersionName()
+            versionCode(20000 + getMyVersionCode())
+            minSdkVersion androidMinSdk()
+            targetSdkVersion androidTargetSdk()
         }
-        LegacyNetworkLocation {
-            applicationId = 'com.google.android.location'
+
+        productFlavors {
+            NetworkLocation {
+                applicationId = 'com.google.android.gms'
+                minSdkVersion 19
+            }
+            LegacyNetworkLocation {
+                applicationId = 'com.google.android.location'
+            }
+            UnifiedNlp {
+                applicationId = 'org.microg.nlp'
+            }
         }
-        UnifiedNlp {
-            applicationId = 'org.microg.nlp'
+
+        lintOptions {
+            disable 'MissingTranslation', 'InvalidPackage', 'BatteryLife', 'ImpliedQuantity', 'MissingQuantity'
+        }
+
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_6
         }
     }
 
-    lintOptions {
-        disable 'MissingTranslation', 'InvalidPackage', 'BatteryLife', 'ImpliedQuantity', 'MissingQuantity'
+    dependencies {
+        compile project(':unifiednlp-base')
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
+    if (file('user.gradle').exists()) {
+        apply from: 'user.gradle'
     }
-}
-
-dependencies {
-    compile project(':unifiednlp-base')
-}
-
-if (file('user.gradle').exists()) {
-    apply from: 'user.gradle'
 }
